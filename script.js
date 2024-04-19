@@ -8,6 +8,17 @@
 // 6 7 8 
 // x x x
 
+// Create variable for number of rows
+// Create variable for number of columns
+// Use nested for loop with these numbers to create the gameboard
+
+// Make a printBoard function to print the gameboard to the console
+
+// Factory function remember, so return the functions (closure)
+
+// Create a module for the gameboard so it can't be reused to make additional instances
+
+
 // 2) player object
 // Stores: name, boolean: is it their turn?, score, boolean: won(? maybe) 
 // Create one human player, that the player controls
@@ -19,7 +30,8 @@
 // Player inputs their placement choice
 // Check if that place isn't already taken
 // If it is already taken, do nothing
-// If it is not taken, assign choice to the empty element in the array, player:turn set to false
+// If it is not taken, assign choice to the empty element in the array
+// Switch players so it's the other player's turn, player:turn set to false
 
 // Game over logic - checking for winning 3-in-a-rows and ties
 // If there's a winning combination
@@ -39,4 +51,5 @@
 // Functions that allow players to add marks to the board by clicking on a board square
 
 // Buttons to start/restart the game
+// Function that plays a round
 // Display element that shows results at the end of the game.
