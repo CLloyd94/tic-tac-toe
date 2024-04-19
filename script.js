@@ -87,8 +87,8 @@ const game = (function () {
         // Switch player turn
         switchPlayerTurn();
         printNewRound();
-
     }
+    printNewRound();
 
     return { playRound, getActivePlayer };
 
