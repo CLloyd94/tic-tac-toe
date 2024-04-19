@@ -1,4 +1,5 @@
 // 1) gameboard object
+// Create a module for the gameboard so it can't be reused to make additional instances
 // Stores: array of values, boolean: gameboard full?
 // Gameboard - an array of 9 empty values inside of an object (for some reason)
 // 0 1 2
@@ -7,21 +8,46 @@
 // x x x
 // 6 7 8 
 // x x x
+const gameboard = (function () {
+    // Create variable for number of rows
+    const rows = 3;
+    // Create variable for number of columns
+    const columns = 3;
+    const board = [];
+    // Use nested for loop with these numbers to create the gameboard
+    for (let i = 0; i < rows; i++) {
+        board[i] = ['row'];
+        for (let j = 0; j < columns; j++) {
+            board[i].push(['column']);
+        }
+    }
+    // Make a printBoard function to print the gameboard to the console
 
-// Create variable for number of rows
-// Create variable for number of columns
-// Use nested for loop with these numbers to create the gameboard
+    return { board };
 
-// Make a printBoard function to print the gameboard to the console
-
-// Factory function remember, so return the functions (closure)
-
-// Create a module for the gameboard so it can't be reused to make additional instances
-
+    // Factory function remember, so return the functions (closure)
+})();
 
 // 2) player object
+function createPlayer(name) {
+    let token;
+    let score = 0;
+
+    const getScore = () => score;
+    const increaseScore = () => score++;
+    return { name, token, score, getScore, increaseScore }
+};
 // Stores: name, boolean: is it their turn?, score, boolean: won(? maybe) 
 // Create one human player, that the player controls
+const playerName = prompt('please enter your name');
+const botName = prompt('please enter your opponent\'s name');
+
+const human = createPlayer(playerName);
+human.token = 'X';
+const bot = createPlayer(botName)
+bot.token = '0';
+
+console.log({human, bot});
 // Create one computer player, which should work out where to go. Easy difficulty: random placement, 
 
 // 3) game object
