@@ -21,9 +21,16 @@ const gameboard = (function () {
             board[i].push(['column']);
         }
     }
-    // Make a printBoard function to print the gameboard to the console
 
-    return { board };
+    const getBoard = () => board;
+
+    // Make a printBoard function to print the gameboard to the console
+    const printBoard = () => {
+        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()))
+        console.log(boardWithCellValues);
+    };
+
+    return { getBoard, printBoard };
 
     // Factory function remember, so return the functions (closure)
 })();
@@ -37,21 +44,56 @@ function createPlayer(name) {
     const increaseScore = () => score++;
     return { name, token, score, getScore, increaseScore }
 };
-// Stores: name, boolean: is it their turn?, score, boolean: won(? maybe) 
-// Create one human player, that the player controls
-const playerName = prompt('please enter your name');
-const botName = prompt('please enter your opponent\'s name');
-
-const human = createPlayer(playerName);
-human.token = 'X';
-const bot = createPlayer(botName)
-bot.token = '0';
-
-console.log({human, bot});
-// Create one computer player, which should work out where to go. Easy difficulty: random placement, 
 
 // 3) game object
-// Stores: matches won so far, boolean: game over, winner (computer or bot), round number
+const game = (function () {
+    // Stores: matches won so far, boolean: game over, winner (computer or bot), round number
+    let round;
+    const board = gameboard();
+    const playerName = prompt('please enter your name');
+    const botName = prompt('please enter your opponent\'s name');
+    // Create one human player, that the player controls
+    const human = createPlayer(playerName);
+    human.token = 'X';
+    // Create one computer player
+    const bot = createPlayer(botName)
+    bot.token = '0';
+
+    const players = [human, bot]
+    console.log({ human, bot });
+
+    let activePlayer = players[0];
+
+    const switchPlayerTurn = () => {
+        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+    };
+    const getActivePlayer = () => activePlayer;
+
+    const printNewRound = () => {
+        board.printBoard();
+        console.log(`${getActivePlayer().name}'s turn.`);
+    };
+
+    const playRound = (column) => {
+        // Drop a token for the current player
+        console.log(
+            `Dropping ${getActivePlayer().name}'s token into column ${column}...`
+        );
+        board.dropToken(column, getActivePlayer().token);
+
+        /*  This is where we would check for a winner and handle that logic,
+            such as a win message. */
+
+        // Switch player turn
+        switchPlayerTurn();
+        printNewRound();
+
+    }
+
+    return { playRound, getActivePlayer };
+
+})();
+
 
 // Player inputs their placement choice
 // Check if that place isn't already taken
