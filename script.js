@@ -102,28 +102,46 @@ const gameController = (function () {
         console.log(`${getActivePlayer().name}'s turn.`);
     };
 
+    function isBoardFull(board) {
+        // Check every cell on the board to see if any are still empty (value 0)
+        return board.every(row => row.every(cell => cell.getValue() !== 0));
+    }
+
+    function checkWinner(board) {
+        // Check rows, columns and diagonals
+        return null;
+    }
+
+
     const playRound = () => {
-        let row, column;
-        if (getActivePlayer() === human) {
-            row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
-            column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
-        } else if (getActivePlayer() === bot) {
-            do {
+        let gameOver = false;
+
+        do {
+            // Do all of our code
+            let row, column;
+            if (getActivePlayer() === human) {
+                row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
+                column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
+            } else {
                 row = Math.floor(Math.random() * 3);
                 column = Math.floor(Math.random() * 3);
-            } while (gameboard.getBoard()[row][column].getValue() !== 0);
-           
-        }
-        console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
-        gameboard.placeMark(row, column, getActivePlayer().mark);
-        
-        /*  This is where we would check for a winner and handle that logic,
-            such as a win message. */
+            }
+            console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
+            gameboard.placeMark(row, column, getActivePlayer().mark);
+            let winner = checkWinner(gameboard.getBoard());
+            if (winner) {
+                console.log(`${winner} wins!`);
+                gameOver = true;
+            } else if (isBoardFull(gameboard.getBoard())) {
+                console.log("It's a tie!");
+                gameOver = true;
+            } else {
+                switchPlayerTurn();
+                printNewRound();
+            }
 
-        // Switch player turn
-        switchPlayerTurn();
-        printNewRound();
-        // Logic for the computer's turn
+        } while (!gameOver);
+       
     }
     printNewRound();
     playRound();
