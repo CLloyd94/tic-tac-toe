@@ -1,7 +1,7 @@
 // 1) gameboard object
 // Create a module for the gameboard so it can't be reused to make additional instances
 // Stores: array of values
-// Gameboard - an array of 9 empty values inside of an object (where the key:value pair is space:token)
+// Gameboard - an array of 9 empty values inside of an object (where the key:value pair is space:mark)
 // 0 1 2
 // x x x
 // 3 4 5 
@@ -86,25 +86,16 @@ const gameController = (function () {
     human.mark = 'X';
     // Create one computer player
     const bot = createPlayer(botName)
-    bot.mark = '0';
+    bot.mark = 'O';
 
-    const players = [human, bot]
     console.log({ human, bot });
 
-    let activePlayer = players[0];
+    let activePlayer = bot;
 
     const switchPlayerTurn = () => {
-        activePlayer = activePlayer === players[0] ? players[1] : players[0];
+        activePlayer = activePlayer === human ? bot : human;
     };
     const getActivePlayer = () => activePlayer;
-
-    // Logic for the computer's turn
-
-
-
-
-
-
 
     const printNewRound = () => {
         gameboard.printBoard();
@@ -112,19 +103,30 @@ const gameController = (function () {
     };
 
     const playRound = () => {
-        const row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
-        const column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
+        let row, column;
+        if (getActivePlayer() === human) {
+            row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
+            column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
+        } else if (getActivePlayer() === bot) {
+            do {
+                row = Math.floor(Math.random() * 3);
+                column = Math.floor(Math.random() * 3);
+            } while (gameboard.getBoard()[row][column].getValue() !== 0);
+           
+        }
         console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
         gameboard.placeMark(row, column, getActivePlayer().mark);
-
+        
         /*  This is where we would check for a winner and handle that logic,
             such as a win message. */
 
         // Switch player turn
         switchPlayerTurn();
         printNewRound();
+        // Logic for the computer's turn
     }
     printNewRound();
+    playRound();
 
     return { playRound, getActivePlayer };
 
