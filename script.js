@@ -16,9 +16,9 @@ const gameboard = (function () {
     const board = [];
     // Use nested for loop with these numbers to create the gameboard
     for (let i = 0; i < rows; i++) {
-        board[i] = ['row'];
+        board[i] = [];
         for (let j = 0; j < columns; j++) {
-            board[i].push(cell);
+            board[i].push(Cell());
         }
     }
 
@@ -27,23 +27,22 @@ const gameboard = (function () {
     // Function for player to mark something on the gameboard
     // Like put mark in certain position within the array
     
-    // Do we actually need cell here?
-    const placeMark = (cell, player) => {
-        const availableCells = board.filter((row) => row[column].getValue() === 0).map(row => row[column]);
+    const placeMark = (row, column, player) => {
+        if (row < 0 || row >= rows || column < 0 || column >= columns) {
+            console.log("Invalid cell coordinates.");
+            return;
+        }
 
-        // If no cells make it through the filter, 
-        // the move is invalid. Stop execution.
-        if (!availableCells.length) return;
-
-        // Otherwise, I have a valid cell, the last one in the filtered array
-        const boardIndex = prompt('where will you place your mark?')
-        
-        board[boardIndex][cell].addToken(player);
+        if (board[row][column].getValue() === 0) {
+            board[row][column].addMark(player);
+        } else {
+            console.log("Cell is already occupied.");
+        }
     };
 
     // Make a printBoard function to print the gameboard to the console
     const printBoard = () => {
-        const boardWithCellValues = board.map((row) => row.map((cell) => cell.getValue()))
+        const boardWithCellValues = board.map((row) => row.map((column) => column.getValue()))
         console.log(boardWithCellValues);
     };
 
@@ -52,7 +51,7 @@ const gameboard = (function () {
     // Factory function remember, so return the functions (closure)
 })();
 
-const cell = (function () {
+function Cell () {
     let value = 0;
 
     // Accept a player's mark to change the value of the cell
@@ -64,31 +63,30 @@ const cell = (function () {
     const getValue = () => value;
 
     return { addMark, getValue };
-})();
+};
 
 // 2) player object
 function createPlayer(name) {
-    let token;
+    let mark;
     let score = 0;
 
     const getScore = () => score;
     const increaseScore = () => score++;
-    return { name, token, score, getScore, increaseScore }
+    return { name, mark, score, getScore, increaseScore }
 };
 
 // 3) game object
-const game = (function () {
+const gameController = (function () {
     // Stores: matches won so far, boolean: game over, winner (computer or bot), round number
-    let round;
-    const board = gameboard();
+    // let round;
     const playerName = prompt('please enter your name');
     const botName = prompt('please enter your opponent\'s name');
     // Create one human player, that the player controls
     const human = createPlayer(playerName);
-    human.token = 'X';
+    human.mark = 'X';
     // Create one computer player
     const bot = createPlayer(botName)
-    bot.token = '0';
+    bot.mark = '0';
 
     const players = [human, bot]
     console.log({ human, bot });
@@ -100,17 +98,24 @@ const game = (function () {
     };
     const getActivePlayer = () => activePlayer;
 
+    // Logic for the computer's turn
+
+
+
+
+
+
+
     const printNewRound = () => {
-        board.printBoard();
+        gameboard.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
     };
 
-    const playRound = (column) => {
-        // Drop a token for the current player
-        console.log(
-            `Dropping ${getActivePlayer().name}'s token into column ${column}...`
-        );
-        board.dropToken(column, getActivePlayer().token);
+    const playRound = () => {
+        const row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
+        const column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
+        console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
+        gameboard.placeMark(row, column, getActivePlayer().mark);
 
         /*  This is where we would check for a winner and handle that logic,
             such as a win message. */
@@ -124,6 +129,8 @@ const game = (function () {
     return { playRound, getActivePlayer };
 
 })();
+
+gameController.playRound();
 
 
 // Player inputs their placement choice
