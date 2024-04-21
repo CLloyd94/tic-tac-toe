@@ -1,7 +1,7 @@
 // 1) gameboard object
 // Create a module for the gameboard so it can't be reused to make additional instances
-// Stores: array of values, boolean: gameboard full?
-// Gameboard - an array of 9 empty values inside of an object (for some reason)
+// Stores: array of values
+// Gameboard - an array of 9 empty values inside of an object (where the key:value pair is space:token)
 // 0 1 2
 // x x x
 // 3 4 5 
@@ -18,11 +18,28 @@ const gameboard = (function () {
     for (let i = 0; i < rows; i++) {
         board[i] = ['row'];
         for (let j = 0; j < columns; j++) {
-            board[i].push(['column']);
+            board[i].push(cell);
         }
     }
 
     const getBoard = () => board;
+
+    // Function for player to mark something on the gameboard
+    // Like put mark in certain position within the array
+    
+    // Do we actually need cell here?
+    const placeMark = (cell, player) => {
+        const availableCells = board.filter((row) => row[column].getValue() === 0).map(row => row[column]);
+
+        // If no cells make it through the filter, 
+        // the move is invalid. Stop execution.
+        if (!availableCells.length) return;
+
+        // Otherwise, I have a valid cell, the last one in the filtered array
+        const boardIndex = prompt('where will you place your mark?')
+        
+        board[boardIndex][cell].addToken(player);
+    };
 
     // Make a printBoard function to print the gameboard to the console
     const printBoard = () => {
@@ -30,9 +47,23 @@ const gameboard = (function () {
         console.log(boardWithCellValues);
     };
 
-    return { getBoard, printBoard };
+    return { getBoard, placeMark, printBoard };
 
     // Factory function remember, so return the functions (closure)
+})();
+
+const cell = (function () {
+    let value = 0;
+
+    // Accept a player's mark to change the value of the cell
+    const addMark = (player) => {
+        value = player;
+    };
+
+    // How we will retrieve the current value of this cell through closure
+    const getValue = () => value;
+
+    return { addMark, getValue };
 })();
 
 // 2) player object
