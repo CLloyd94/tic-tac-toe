@@ -1,13 +1,5 @@
 // 1) gameboard object
 // Create a module for the gameboard so it can't be reused to make additional instances
-// Stores: array of values
-// Gameboard - an array of 9 empty values inside of an object (where the key:value pair is space:mark)
-// 0 1 2
-// x x x
-// 3 4 5 
-// x x x
-// 6 7 8 
-// x x x
 const gameboard = (function () {
     // Create variable for number of rows
     const rows = 3;
@@ -30,13 +22,14 @@ const gameboard = (function () {
     const placeMark = (row, column, player) => {
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
             console.log("Invalid cell coordinates.");
-            return;
+            return false;
         }
-
         if (board[row][column].getValue() === 0) {
             board[row][column].addMark(player);
+            return true;
         } else {
             console.log("Cell is already occupied.");
+            return false;
         }
     };
 
@@ -108,10 +101,42 @@ const gameController = (function () {
     }
 
     function checkWinner(board) {
-        // Check rows, columns and diagonals
-        return null;
-    }
+        // Check rows, columns and diagonals       
+        const rows = 3;
+        const columns = 3;
 
+        for (let i = 0; i < rows; i++) {
+            if (board[i][0].getValue() !== 0 &&
+                board[i][0].getValue() === board[i][1].getValue() &&
+                board[i][0].getValue() === board[i][2].getValue()) {
+                return board[i][0].getValue(); // Winner found
+            }
+        }
+
+        // Check columns for a winner
+        for (let j = 0; j < columns; j++) {
+            if (board[0][j].getValue() !== 0 &&
+                board[0][j].getValue() === board[1][j].getValue() &&
+                board[0][j].getValue() === board[2][j].getValue()) {
+                return board[0][j].getValue(); // Winner found
+            }
+        }
+
+        // Check diagonal (top-left to bottom-right)
+        if (board[0][0].getValue() !== 0 &&
+            board[0][0].getValue() === board[1][1].getValue() &&
+            board[0][0].getValue() === board[2][2].getValue()) {
+            return board[0][0].getValue(); // Winner found
+        }
+
+        // Check diagonal (top-right to bottom-left)
+        if (board[0][2].getValue() !== 0 &&
+            board[0][2].getValue() === board[1][1].getValue() &&
+            board[0][2].getValue() === board[2][0].getValue()) {
+            return board[0][2].getValue(); // Winner found
+        }
+        return null; // No winner found
+    };
 
     const playRound = () => {
         let gameOver = false;
@@ -123,14 +148,21 @@ const gameController = (function () {
                 row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
                 column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
             } else {
-                row = Math.floor(Math.random() * 3);
-                column = Math.floor(Math.random() * 3);
+                let success = false;
+                while (!success) {
+                    row = Math.floor(Math.random() * 3);
+                    column = Math.floor(Math.random() * 3);
+                    success = gameboard.placeMark(row, column, bot.mark);
+                }
             }
             console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
             gameboard.placeMark(row, column, getActivePlayer().mark);
+            printNewRound();
+            
+            // Need some logic to handle player scores after they win a round.
             let winner = checkWinner(gameboard.getBoard());
             if (winner) {
-                console.log(`${winner} wins!`);
+                console.log(`${winner === 1 ? human.name : bot.name} wins!`);
                 gameOver = true;
             } else if (isBoardFull(gameboard.getBoard())) {
                 console.log("It's a tie!");
@@ -143,39 +175,20 @@ const gameController = (function () {
         } while (!gameOver);
        
     }
-    printNewRound();
-    playRound();
-
-    return { playRound, getActivePlayer };
+    const startGame = () => {
+        printNewRound();
+        playRound();
+    }
+    
+    return { startGame, getActivePlayer };
 
 })();
 
-gameController.playRound();
+gameController.startGame();
 
-
-// Player inputs their placement choice
-// Check if that place isn't already taken
-// If it is already taken, do nothing
-// If it is not taken, assign choice to the empty element in the array
-// Switch players so it's the other player's turn, player:turn set to false
-
-// Game over logic - checking for winning 3-in-a-rows and ties
-// If there's a winning combination
-// Winning combinations would be as a formula:
-// Winning row: n + 1 + 1;
-// Winning column: n + 3 + 3;
-// Diagonal left to right: n + 4 + 4;
-// Diagonal right to left: n + 2 + 2;
-// If X matches this pattern, player score ++, next round, start new round
-// else if O matches this, computer score ++
-// Else if there's a tie, don't increment scores, start new round
-
-
-// hard difficulty: detect where the player goes and play accordingly
 
 // 4th object that handles the display/DOM logic - renders the contents of the gameboard array to the webpage
 // Functions that allow players to add marks to the board by clicking on a board square
-
 // Buttons to start/restart the game
 // Function that plays a round
 // Display element that shows results at the end of the game.
