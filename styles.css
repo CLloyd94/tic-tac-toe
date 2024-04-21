@@ -2,3 +2,65 @@
     box-sizing: border-box;
     /* border: red 2px solid; */
 }
+
+body {
+    background-color: var(--bg-color);
+    /* display: flex;
+    flex: 1; */
+    justify-content: center;
+}
+
+button {
+    font-weight: bold;
+    border-radius: 5px solid black;
+    padding: 10px 20px;
+    color: var(--grid-color);
+    border: none;
+    width: auto;
+    font-size: 16px;
+}
+
+:root {
+    --bg-color: #F7F4F3;
+    --grid-color: #011936;
+    --player-color: #F9DC5C;
+    --bot-color: #F4FFFD;
+    --reset-color: #ED254E;
+}
+
+.computer-score-button {
+    background-color: var(--bot-color);
+
+}
+
+.player-score-button, .rounds-button {
+    background-color: var(--player-color);
+
+}
+
+.reset-button {
+    background-color: var(--reset-color);
+
+}
+
+.gameboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    flex-wrap: wrap;
+    display: flex;
+}
+
+.cell {
+    background-color: var(--grid-color);
+    height: 90px;
+    width: 90px;
+    flex: 1;
+}
+
+.score-buttons {
+    padding: 0px 20px;
+    margin-bottom: 15px;
+
+}

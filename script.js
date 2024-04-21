@@ -71,6 +71,7 @@ function createPlayer(name) {
 // 3) game object
 const gameController = (function () {
     // Stores: matches won so far, boolean: game over, winner (computer or bot), round number
+    // Include logic for number of rounds - loop through until number of rounds complete
     // let round;
     const playerName = prompt('please enter your name');
     const botName = prompt('please enter your opponent\'s name');
