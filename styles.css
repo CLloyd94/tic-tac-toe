@@ -9,22 +9,24 @@ body {
     background-color: var(--bg-color);
     display: grid;
     /* grid-template-rows: repeat(4, auto); */
-    padding: 0px 60px;
+    padding: 20px 60px;
 }
 
 button {
     font-weight: bold;
     border-radius: 5px;
     border: 2px solid black;
-    padding: 10px 20px;
+    padding: 10px 15px;
     color: var(--grid-color);
     font-size: 16px;
     width: 220px;
+    text-align: left;
 }
 
 h1 {
     text-align: center;
     margin: 1rem 0;
+    font-size: 2.5rem;
 }
 
 :root {
@@ -53,7 +55,7 @@ h1 {
 
 .gameboard {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0,180px));
+    grid-template-columns: repeat(3, minmax(0,140px));
     /* grid-template-rows: repeat(3, 1fr); */
     gap: 5px;
     justify-content: center;
@@ -71,23 +73,28 @@ h1 {
 }
 
 .score-buttons, .footer-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
-    margin-bottom: 15px;
+    margin: 15px auto;
     justify-content: center;
 }
 
-.footer-buttons {
+.score-buttons {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5px;
+}
+
+.footer-buttons {
+    display: flex;
+    flex-direction: column;
     gap: 5px;
 }
 
 .rounds-button {
     background-color: white;
+    text-align: center;
 }
 
 .reset-button {
     color: white;
+    text-align: center;
 }
