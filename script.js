@@ -1,5 +1,4 @@
-// 1) gameboard object
-// Create a module for the gameboard so it can't be reused to make additional instances
+// 1) gameboard object/module
 const gameboard = (function () {
     // Create variable for number of rows
     const rows = 3;
@@ -44,6 +43,7 @@ const gameboard = (function () {
     // Factory function remember, so return the functions (closure)
 })();
 
+// Cell factory function
 function Cell () {
     let value = 0;
 
@@ -52,13 +52,13 @@ function Cell () {
         value = player;
     };
 
-    // How we will retrieve the current value of this cell through closure
+    // Get the current value of the cell
     const getValue = () => value;
 
     return { addMark, getValue };
 };
 
-// 2) player object
+// 2) player factory function
 function createPlayer(name) {
     let mark;
     let score = 0;
@@ -68,7 +68,7 @@ function createPlayer(name) {
     return { name, mark, score, getScore, increaseScore }
 };
 
-// 3) game object
+// 3) game object/module
 const gameController = (function () {
     // Stores: matches won so far, boolean: game over, winner (computer or bot), round number
     // Include logic for number of rounds - loop through until number of rounds complete
@@ -164,6 +164,7 @@ const gameController = (function () {
             let winner = checkWinner(gameboard.getBoard());
             if (winner) {
                 console.log(`${winner === 1 ? human.name : bot.name} wins!`);
+                winner.increaseScore();
                 gameOver = true;
             } else if (isBoardFull(gameboard.getBoard())) {
                 console.log("It's a tie!");
@@ -181,15 +182,66 @@ const gameController = (function () {
         playRound();
     }
     
-    return { startGame, getActivePlayer };
+    return { playRound, getActivePlayer };
 
 })();
 
-gameController.startGame();
+// Display controller module (controls display)
+const displayController = (function () {
+    // Renders the contents of the gameboard array to the webpage.
+    // Get the gameboard array from the factory function (the array)
+    const boardDiv = document.querySelector('.gameboard');
+    const updateScreen = () => {
+        boardDiv.textContent = '';
+        // Get the board array
+        const board = gameboard.getBoard();
+        const activePlayer = gameController.getActivePlayer();
+        board.forEach(row => {
+            row.forEach((cell, index) => {
+                const cellButton = document.createElement('button');
+                cellButton.classList.add('cell');
+                cellButton.dataset = index; // huh?
+                cellButton.textContent = cell.getValue();
+                boardDiv.appendChild(cellButton);
+            })
+        })
+    }
+    function clickHandlerBoard(e) {
+        const selectedCell = e.target.dataset;
+        if (!selectedCell) return;
+        gameController.playRound(selectedCell);
+        updateScreen();
+    };
+
+    boardDiv.addEventListener('click', clickHandlerBoard);
+    updateScreen();
+    // Maybe using an index? Upon clicking a cell...
+        // Map that element to the array
+    // For each cell
+
+    // Event listeners for cells
+    // When each cell is clicked,
+    // Map the element clicked to the array?
+    // Or register that element clicked as a space in the array
+})();
+
+// displayController();
 
 
-// 4th object that handles the display/DOM logic - renders the contents of the gameboard array to the webpage
+
+
+
+// Event listener for reset button
+
+// Event listener for start game button (within a dialog?)
+
+// Display data inside certain buttons e.g.
+// Number of rounds in the round button
+// Scores in the score buttons
+
+// Display a winner
+
+
+// gameController.startGame();
+
 // Functions that allow players to add marks to the board by clicking on a board square
-// Buttons to start/restart the game
-// Function that plays a round
-// Display element that shows results at the end of the game.
