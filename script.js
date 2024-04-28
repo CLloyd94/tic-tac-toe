@@ -30,15 +30,10 @@ const gameboard = (function () {
         }
     };
 
-    // Make a printBoard function to print the gameboard to the console
-    const printBoard = () => {
-        const boardWithCellValues = board.map((row) => row.map((column) => column.getValue()))
-        console.log(boardWithCellValues);
-    };
+    // clearBoard function to clear all values from all cells
+    const clearBoard = () => board.length = 0; 
 
-    return { getBoard, placeMark, printBoard };
-
-    // Factory function remember, so return the functions (closure)
+    return { getBoard, placeMark, clearBoard };
 })();
 
 // Cell factory function
@@ -57,8 +52,7 @@ function Cell () {
 };
 
 // 2) player factory function
-function createPlayer(name) {
-    let mark;
+function createPlayer(name, mark) {
     let score = 0;
 
     const getScore = () => score;
@@ -68,30 +62,26 @@ function createPlayer(name) {
 
 // 3) game object/module
 const gameController = (function () {
-    // Stores: matches won so far, boolean: game over, winner (computer or bot), round number
-    // Include logic for number of rounds - loop through until number of rounds complete
-    // let round;
     const playerName = prompt('please enter your name');
     const botName = prompt('please enter your opponent\'s name');
     // Create one human player, that the player controls
-    const human = createPlayer(playerName);
-    human.mark = 'X';
+    const human = createPlayer(playerName, 'X');
     // Create one computer player
-    const bot = createPlayer(botName)
-    bot.mark = 'O';
+    const bot = createPlayer(botName, 'O')
 
-    console.log({ human, bot });
+    // console.log({ human, bot });
 
-    let activePlayer = bot;
+    let activePlayer = human;
 
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === human ? bot : human;
     };
     const getActivePlayer = () => activePlayer;
 
-    const printNewRound = () => {
-        gameboard.printBoard();
-        console.log(`${getActivePlayer().name}'s turn.`);
+    const startNewRound = () => {
+        gameboard.clearBoard();
+        playRound();
+        // console.log(`${getActivePlayer().name}'s turn.`);
     };
 
     function isBoardFull(board) {
@@ -137,6 +127,8 @@ const gameController = (function () {
         return null; // No winner found
     };
 
+    // Include logic for number of rounds - loop through until number of rounds complete
+    // let round;
     const playRound = () => {
         let gameOver = false;
 
@@ -156,7 +148,7 @@ const gameController = (function () {
             }
             console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
             gameboard.placeMark(row, column, getActivePlayer().mark);
-            printNewRound();
+            startNewRound();
             
             // Need some logic to handle player scores after they win a round.
             let winner = checkWinner(gameboard.getBoard());
@@ -169,14 +161,14 @@ const gameController = (function () {
                 gameOver = true;
             } else {
                 switchPlayerTurn();
-                printNewRound();
+                startNewRound();
             }
 
         } while (!gameOver);
        
     }
     const startGame = () => {
-        printNewRound();
+        startNewRound();
         playRound();
     }
     
