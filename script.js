@@ -12,12 +12,10 @@ const gameboard = (function () {
             board[i].push(Cell());
         }
     }
-
+    // Allows other functions to read the board
     const getBoard = () => board;
 
-    // Function for player to mark something on the gameboard
-    // Like put mark in certain position within the array
-    
+    // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
             console.log("Invalid cell coordinates.");
