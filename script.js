@@ -17,6 +17,7 @@ const gameboard = (function () {
 
     // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
+
         // If the selection is not a cell
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
             console.log("Invalid cell coordinates.");
@@ -142,25 +143,11 @@ const gameController = (function () {
 
     // Include logic for number of rounds - loop through until number of rounds complete
     // let round;
-    const playRound = () => {
+    const playRound = (row, column) => {
         let gameOver = false;
 
         do {
-            // Do all of our code
-            let row, column;
-            let success = false;
-
-            while (!success) {
-                if (getActivePlayer() === human) {
-                    row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
-                    column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
-                } else {
-                    row = Math.floor(Math.random() * 3);
-                    column = Math.floor(Math.random() * 3);
-                }
-                success = gameboard.placeMark(row, column, getActivePlayer().mark);
-                console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
-            }
+            gameboard.placeMark(row, column, getActivePlayer().mark);
             
             // Need some logic to handle player scores after they win a round.
             let winner = checkWinner(gameboard.getBoard());
@@ -190,70 +177,57 @@ const gameController = (function () {
 const displayController = (function () {
     // Renders the contents of the gameboard array to the webpage.
     // Get the gameboard array from the factory function (the array)
-    
     // Query selectors
     const boardDiv = document.querySelector('.gameboard');
     const playerScore = document.querySelector('.player-score-button');
     const botScore = document.querySelector('.bot-score-button');
-    // Container for cells
+    const roundsButton = document.querySelector('.rounds-button');
+    const resetButton = document.querySelector('.reset-button');
+    // Other variables
     const cells = document.querySelectorAll('.cell');
     // Get board array
     const board = gameboard.getBoard();
-
-    for (const cell of board) {
-        cells.push(`${cell}`);
-    }
-
-    cells.forEach((cell) => cell.innerHTML = board.join());
-
+    const activePlayer = gameController.getActivePlayer();
     const human = gameController.getHuman();
     const bot = gameController.getBot();
+    // Display scores at the top
     playerScore.textContent = `${human.name}'s score: ${human.score}`;
-    
     botScore.textContent = `${bot.name}'s score: ${bot.score}`;
 
-
-
     const updateScreen = () => {
-        boardDiv.textContent = '';
+        boardDiv.innerHTML = '';
         // Get the board array
         const board = gameboard.getBoard();
-        const activePlayer = gameController.getActivePlayer();
-        board.forEach(row => {
-            row.forEach((cell, index) => {
+        
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
                 const cellButton = document.createElement('button');
-                cellButton.classList.add('cell');
-                cellButton.dataset = index; // huh?
+                cellButton.className = 'cell';
                 cellButton.textContent = cell.getValue();
+                cellButton.dataset.row = rowIndex; // huh?
+                cellButton.dataset.row = colIndex; // huh?
+                cellButton.addEventListener('click', cellClickHandler);
                 boardDiv.appendChild(cellButton);
-            })
-        })
+            });
+        });
     }
-    function clickHandlerBoard(e) {
-        const selectedCell = e.target.dataset;
-        if (!selectedCell) return;
-        gameController.playRound(selectedCell);
-        updateScreen();
+    function cellClickHandler(e) {
+        const row = parseInt(e.target.dataset.row, 10);
+        const column = parseInt(e.target.dataset.column, 10);
+        const activePlayer = gameController.getActivePlayer();
+        if (gameboard.placeMark(row, column, activePlayer.mark)) {
+            displayController.updateScreen();
+        }
+        // if (!selectedCell) return;
+        // gameController.playRound(selectedCell);
+        // updateScreen();
     };
 
-    boardDiv.addEventListener('click', clickHandlerBoard);
+    boardDiv.addEventListener('click', cellClickHandler);
     updateScreen();
-
-    // Maybe using an index? Upon clicking a cell...
-        // Map that element to the array
-    // For each cell
-
-    // Event listeners for cells
-    // When each cell is clicked,
-    // Map the element clicked to the array?
-    // Or register that element clicked as a space in the array
 })();
 
 // displayController();
-
-
-
-
 
 // Event listener for reset button
 
@@ -267,5 +241,3 @@ const displayController = (function () {
 
 
 // gameController.startGame();
-
-// Functions that allow players to add marks to the board by clicking on a board square
