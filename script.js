@@ -73,6 +73,14 @@ const gameController = (function () {
     // Create one computer player
     const bot = createPlayer(botName, 'O')
 
+    // Getter for human player
+    const getHuman = () => human;
+
+    // Getter for bot player
+    const getBot = () => bot;
+
+
+
     // console.log({ human, bot });
 
     let activePlayer = human;
@@ -160,9 +168,11 @@ const gameController = (function () {
                 console.log(`${winner === 1 ? human.name : bot.name} wins!`);
                 winner.increaseScore();
                 gameOver = true;
+                startNewGame();
             } else if (isBoardFull(gameboard.getBoard())) {
                 console.log("It's a tie!");
                 gameOver = true;
+                startNewGame();
             } else {
                 switchPlayerTurn();
             }
@@ -172,7 +182,7 @@ const gameController = (function () {
     }
     // startNewGame();
 
-    return { playRound, getActivePlayer, startNewGame };
+    return { playRound, getHuman, getBot, getActivePlayer, startNewGame };
 
 })();
 
@@ -181,6 +191,14 @@ const displayController = (function () {
     // Renders the contents of the gameboard array to the webpage.
     // Get the gameboard array from the factory function (the array)
     const boardDiv = document.querySelector('.gameboard');
+    const playerScore = document.querySelector('.player-score-button');
+
+    const human = gameController.getHuman();
+    const bot = gameController.getBot();
+    playerScore.textContent = `${human.name}'s score: ${human.score}`;
+    const botScore = document.querySelector('.bot-score-button');
+    botScore.textContent = `${bot.name}'s score: ${bot.score}`;
+
     const updateScreen = () => {
         boardDiv.textContent = '';
         // Get the board array
