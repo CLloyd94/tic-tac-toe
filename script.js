@@ -25,6 +25,7 @@ const gameboard = (function () {
         // If the selected cell is empty, add the player's mark
         if (board[row][column].getValue() === 0) {
             board[row][column].addMark(player);
+            console.log("Successful move.");
             return true;
         // If the selected cell is not empty
         } else {
@@ -138,21 +139,20 @@ const gameController = (function () {
 
         do {
             // Do all of our code
-            let row, column; 
+            let row, column;
+            let success = false;
 
-            if (getActivePlayer() === human) {
-                row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
-                column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
-            } else {
-                let success = false;
-                while (!success) {
+            while (!success) {
+                if (getActivePlayer() === human) {
+                    row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
+                    column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
+                } else {
                     row = Math.floor(Math.random() * 3);
                     column = Math.floor(Math.random() * 3);
-                    success = gameboard.placeMark(row, column, bot.mark);
                 }
+                success = gameboard.placeMark(row, column, getActivePlayer().mark);
+                console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
             }
-            console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
-            gameboard.placeMark(row, column, getActivePlayer().mark);
             
             // Need some logic to handle player scores after they win a round.
             let winner = checkWinner(gameboard.getBoard());
@@ -170,7 +170,7 @@ const gameController = (function () {
         } while (!gameOver);
        
     }
-    startNewGame();
+    // startNewGame();
 
     return { playRound, getActivePlayer, startNewGame };
 
@@ -205,6 +205,9 @@ const displayController = (function () {
 
     boardDiv.addEventListener('click', clickHandlerBoard);
     updateScreen();
+
+    // const cells = document.querySelectorAll('.cell');
+
     // Maybe using an index? Upon clicking a cell...
         // Map that element to the array
     // For each cell
