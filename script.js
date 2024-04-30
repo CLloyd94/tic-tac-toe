@@ -12,6 +12,7 @@ const gameboard = (function () {
             board[i].push(Cell());
         }
     }
+    
     // Allows other functions to read the board
     const getBoard = () => board;
 
@@ -36,7 +37,15 @@ const gameboard = (function () {
     };
 
     // clearBoard function to clear all values from all cells
-    const clearBoard = () => board.length = 0; 
+    const clearBoard = () => {
+        board.length = 0;
+        for (let i = 0; i < rows; i++) {
+            board[i] = [];
+            for (let j = 0; j < columns; j++) {
+                board[i].push(Cell());
+            }
+        }
+    }
 
     return { getBoard, placeMark, clearBoard };
 })();
@@ -79,10 +88,6 @@ const gameController = (function () {
 
     // Getter for bot player
     const getBot = () => bot;
-
-
-
-    // console.log({ human, bot });
 
     let activePlayer = human;
 
@@ -145,29 +150,27 @@ const gameController = (function () {
     // let round;
     const playRound = (row, column) => {
         let gameOver = false;
-
-        do {
-            gameboard.placeMark(row, column, getActivePlayer().mark);
-            
-            // Need some logic to handle player scores after they win a round.
-            let winner = checkWinner(gameboard.getBoard());
-            if (winner) {
-                console.log(`${winner === 1 ? human.name : bot.name} wins!`);
-                winner.increaseScore();
-                gameOver = true;
-                startNewGame();
-            } else if (isBoardFull(gameboard.getBoard())) {
-                console.log("It's a tie!");
-                gameOver = true;
-                startNewGame();
-            } else {
-                switchPlayerTurn();
-            }
-
-        } while (!gameOver);
-       
-    }
-    // startNewGame();
+        
+        gameboard.placeMark(row, column, getActivePlayer().mark);
+        console.log(`Active player: ${activePlayer}`);
+        
+        // Need some logic to handle player scores after they win a round.
+        let winner = checkWinner(gameboard.getBoard());
+        if (winner) {
+            console.log(`${winner === 1 ? human.name : bot.name} wins!`);
+            winner.increaseScore();
+            gameOver = true;
+            console.log('Starting new game');
+            startNewGame();
+        } else if (isBoardFull(gameboard.getBoard())) {
+            console.log("It's a tie!");
+            gameOver = true;
+            startNewGame();
+        } else {
+            switchPlayerTurn();
+            console.log(`It is now ${getActivePlayer().name}'s turn`);
+        }
+}
 
     return { playRound, getHuman, getBot, getActivePlayer, startNewGame };
 
@@ -205,8 +208,19 @@ const displayController = (function () {
                 cellButton.className = 'cell';
                 cellButton.textContent = cell.getValue();
                 cellButton.dataset.row = rowIndex; // huh?
-                cellButton.dataset.row = colIndex; // huh?
+                cellButton.dataset.column = colIndex; // huh?
+                cellButton.style.color = (activePlayer === human) ? '#F9DC5C' : '#F4FFFD';
                 cellButton.addEventListener('click', cellClickHandler);
+
+                // Setting text based on cell value
+                let cellValue = cell.getValue();
+                cellButton.textContent = cellValue === 0 ? "" : cellValue;  // Display empty string if value is 0
+
+                // Apply color based on cell mark
+                if (cellValue !== 0) {  // Only color if there is a mark
+                    cellButton.style.color = (cellValue === 'X') ? '#F9DC5C' : '#F4FFFD';
+                }
+
                 boardDiv.appendChild(cellButton);
             });
         });
@@ -216,7 +230,7 @@ const displayController = (function () {
         const column = parseInt(e.target.dataset.column, 10);
         const activePlayer = gameController.getActivePlayer();
         if (gameboard.placeMark(row, column, activePlayer.mark)) {
-            displayController.updateScreen();
+            updateScreen();
         }
         // if (!selectedCell) return;
         // gameController.playRound(selectedCell);
