@@ -190,14 +190,29 @@ const gameController = (function () {
 const displayController = (function () {
     // Renders the contents of the gameboard array to the webpage.
     // Get the gameboard array from the factory function (the array)
+    
+    // Query selectors
     const boardDiv = document.querySelector('.gameboard');
     const playerScore = document.querySelector('.player-score-button');
+    const botScore = document.querySelector('.bot-score-button');
+    // Container for cells
+    const cells = document.querySelectorAll('.cell');
+    // Get board array
+    const board = gameboard.getBoard();
+
+    for (const cell of board) {
+        cells.push(`${cell}`);
+    }
+
+    cells.forEach((cell) => cell.innerHTML = board.join());
 
     const human = gameController.getHuman();
     const bot = gameController.getBot();
     playerScore.textContent = `${human.name}'s score: ${human.score}`;
-    const botScore = document.querySelector('.bot-score-button');
+    
     botScore.textContent = `${bot.name}'s score: ${bot.score}`;
+
+
 
     const updateScreen = () => {
         boardDiv.textContent = '';
@@ -223,8 +238,6 @@ const displayController = (function () {
 
     boardDiv.addEventListener('click', clickHandlerBoard);
     updateScreen();
-
-    // const cells = document.querySelectorAll('.cell');
 
     // Maybe using an index? Upon clicking a cell...
         // Map that element to the array
