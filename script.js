@@ -17,13 +17,16 @@ const gameboard = (function () {
 
     // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
+        // If the selection is not a cell
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
             console.log("Invalid cell coordinates.");
             return false;
         }
+        // If the selected cell is empty, add the player's mark
         if (board[row][column].getValue() === 0) {
             board[row][column].addMark(player);
             return true;
+        // If the selected cell is not empty
         } else {
             console.log("Cell is already occupied.");
             return false;
@@ -64,7 +67,7 @@ function createPlayer(name, mark) {
 const gameController = (function () {
     const playerName = prompt('please enter your name');
     const botName = prompt('please enter your opponent\'s name');
-    // Create one human player, that the player controls
+    // Create one human player
     const human = createPlayer(playerName, 'X');
     // Create one computer player
     const bot = createPlayer(botName, 'O')
@@ -78,14 +81,14 @@ const gameController = (function () {
     };
     const getActivePlayer = () => activePlayer;
 
-    const startNewRound = () => {
+    const startNewGame = () => {
         gameboard.clearBoard();
         playRound();
         // console.log(`${getActivePlayer().name}'s turn.`);
     };
 
+    // Checks if every cell in every row is full and returns true if so
     function isBoardFull(board) {
-        // Check every cell on the board to see if any are still empty (value 0)
         return board.every(row => row.every(cell => cell.getValue() !== 0));
     }
 
@@ -94,6 +97,7 @@ const gameController = (function () {
         const rows = 3;
         const columns = 3;
 
+        // Check rows for a winner
         for (let i = 0; i < rows; i++) {
             if (board[i][0].getValue() !== 0 &&
                 board[i][0].getValue() === board[i][1].getValue() &&
@@ -134,7 +138,8 @@ const gameController = (function () {
 
         do {
             // Do all of our code
-            let row, column;
+            let row, column; 
+
             if (getActivePlayer() === human) {
                 row = parseInt(prompt('Enter the row number (0, 1, 2):'), 10);
                 column = parseInt(prompt('Enter the column number (0, 1, 2):'), 10);
@@ -148,7 +153,6 @@ const gameController = (function () {
             }
             console.log(`Placing ${getActivePlayer().name}'s mark into cell ${[row, column]}...`);
             gameboard.placeMark(row, column, getActivePlayer().mark);
-            startNewRound();
             
             // Need some logic to handle player scores after they win a round.
             let winner = checkWinner(gameboard.getBoard());
@@ -161,18 +165,14 @@ const gameController = (function () {
                 gameOver = true;
             } else {
                 switchPlayerTurn();
-                startNewRound();
             }
 
         } while (!gameOver);
        
     }
-    const startGame = () => {
-        startNewRound();
-        playRound();
-    }
-    
-    return { playRound, getActivePlayer };
+    startNewGame();
+
+    return { playRound, getActivePlayer, startNewGame };
 
 })();
 
