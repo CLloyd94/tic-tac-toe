@@ -17,7 +17,6 @@ const gameboard = (function () {
     const getBoard = () => board;
     // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
-
         // If the selection is not a cell
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
             console.log(`Invalid cell coordinates, ${player}!`);
@@ -37,10 +36,11 @@ const gameboard = (function () {
 
     // clearBoard function to clear all values from all cells
     const clearBoard = () => {
-        board.forEach(row => {
-            row.forEach(cell => cell.clear());
-        });
-    }
+        board.forEach(row => row.forEach(cell => {
+            cell.clear();
+        }));
+    };
+
     return { getBoard, placeMark, clearBoard };
 })();
 
@@ -142,10 +142,12 @@ const gameController = (function () {
             (winner === 'X' ? human : bot).increaseScore();
             console.log('Starting new game');
             gameboard.clearBoard();
+            switchPlayerTurn();
             displayController.updateScreen();
         } else if (isBoardFull(gameboard.getBoard())) {
             console.log("It's a tie!");
             gameboard.clearBoard();
+            switchPlayerTurn();
             displayController.updateScreen();
         } else {
             switchPlayerTurn(); // not doing so correctly.
@@ -165,7 +167,6 @@ const gameController = (function () {
             }
         } else {
             if (!gameboard.placeMark(row, column, human.mark)) {
-                console.log(`${activePlayer} placed mark at [${row}, ${column}]`);
                 console.log('Invalid move by human');
                 return;
             }
@@ -225,10 +226,7 @@ const displayController = (function () {
 
     // Event listener for reset button
     resetButton.addEventListener('click', () => {
-        console.log(`reset button clicked`)
         gameboard.clearBoard();
-        human.score = 0;
-        bot.score = 0;
         updateScreen();
     });
 
