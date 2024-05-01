@@ -15,10 +15,8 @@ const gameboard = (function () {
     
     // Allows other functions to read the board
     const getBoard = () => board;
-
     // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
-
 
         // If the selection is not a cell
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
@@ -39,15 +37,10 @@ const gameboard = (function () {
 
     // clearBoard function to clear all values from all cells
     const clearBoard = () => {
-        // board.length = 0;
-        for (let i = 0; i < rows; i++) {
-            // board[i] = [];
-            for (let j = 0; j < columns; j++) {
-                board[i][j].clear();
-            }
-        }
+        board.forEach(row => {
+            row.forEach(cell => cell.clear());
+        });
     }
-
     return { getBoard, placeMark, clearBoard };
 })();
 
@@ -71,22 +64,20 @@ function Cell () {
 };
 
 // 2) player factory function
-function createPlayer(name, mark) {
+function createPlayer(mark) {
     let score = 0;
 
     const getScore = () => score;
     const increaseScore = () => score++;
-    return { name, mark, score, getScore, increaseScore }
+    return { mark, score, getScore, increaseScore }
 };
 
 // 3) game object/module
 const gameController = (function () {
-    const playerName = prompt('please enter your name');
-    const botName = prompt('please enter your opponent\'s name');
     // Create one human player
-    const human = createPlayer(playerName, 'X');
+    const human = createPlayer('X');
     // Create one computer player
-    const bot = createPlayer(botName, 'O')
+    const bot = createPlayer('O')
     // Getter for human player
     const getHuman = () => human;
     // Getter for bot player
@@ -147,7 +138,7 @@ const gameController = (function () {
     const updateGameState = () => {
         let winner = checkWinner(gameboard.getBoard());
         if (winner) {
-            console.log(`${winner === 'X' ? human.name : bot.name} wins!`);
+            console.log(`${winner === 'X' ? 'X' : 'O'} wins!`);
             (winner === 'X' ? human : bot).increaseScore();
             console.log('Starting new game');
             gameboard.clearBoard();
@@ -158,12 +149,10 @@ const gameController = (function () {
             displayController.updateScreen();
         } else {
             switchPlayerTurn(); // not doing so correctly.
-            console.log(`It is now ${getActivePlayer().name}'s turn`);
+            console.log(`It is now ${getActivePlayer().mark}'s turn`);
         }
     };
 
-    // Include logic for number of rounds - loop through until number of rounds complete
-    // let round;
     const playRound = (row, column) => {
         if (activePlayer === bot) {
             let placed = false;
@@ -183,42 +172,29 @@ const gameController = (function () {
         }
         updateGameState();
     }
-        // gameboard.placeMark(row, column, getActivePlayer().mark);
-        // switchPlayerTurn();
-
-    // if (gameboard.placeMark(row, column, getActivePlayer().mark)) {
-    
 
     return { playRound, getHuman, getBot, getActivePlayer }; // add startNewGame if necessary
 
 })();
 
-// Display controller module (controls display)
+// Renders the contents of the gameboard array to the webpage.
 const displayController = (function () {
-    // Renders the contents of the gameboard array to the webpage.
-    // Get the gameboard array from the factory function (the array)
     // Query selectors
     const boardDiv = document.querySelector('.gameboard');
     const playerScore = document.querySelector('.player-score-button');
     const botScore = document.querySelector('.bot-score-button');
-    const roundsButton = document.querySelector('.rounds-button');
     const resetButton = document.querySelector('.reset-button');
     // Other variables
-    // Get board array
-    const board = gameboard.getBoard();
-    const activePlayer = gameController.getActivePlayer();
     const human = gameController.getHuman();
     const bot = gameController.getBot();
-    // Display scores at the top
-    playerScore.textContent = `${human.name}'s score: ${human.score}`;
-    botScore.textContent = `${bot.name}'s score: ${bot.score}`;
 
-    // Clear the screen with a new board
+    // Clears the screen with a new board
     const updateScreen = () => {
+        playerScore.textContent = `X's score: ${human.getScore()}`;
+        botScore.textContent = `O's score: ${bot.getScore()}`;
         boardDiv.innerHTML = '';
         // Get the board array
         const board = gameboard.getBoard();
-        
         board.forEach((row, rowIndex) => {
             row.forEach((cell, colIndex) => {
                 const cellButton = document.createElement('button');
@@ -226,9 +202,7 @@ const displayController = (function () {
                 cellButton.textContent = cell.getValue();
                 cellButton.dataset.row = rowIndex; // huh?
                 cellButton.dataset.column = colIndex; // huh?
-                cellButton.style.color = (activePlayer === human) ? '#F9DC5C' : '#F4FFFD';
                 cellButton.addEventListener('click', cellClickHandler);
-
                 // Setting text based on cell value
                 let cellValue = cell.getValue();
                 cellButton.textContent = cellValue === 0 ? "" : cellValue;  // Display empty string if value is 0
@@ -245,37 +219,23 @@ const displayController = (function () {
     function cellClickHandler(e) {
         const row = parseInt(e.target.dataset.row, 10);
         const column = parseInt(e.target.dataset.column, 10);
-        // const selectedCell = row[column];
-        // if (!selectedCell) return;
         gameController.playRound(row, column)
         updateScreen();
-        
-        // if (!selectedCell) return;
-        // gameController.playRound(selectedCell);
-        // updateScreen();
     };
 
     // Event listener for reset button
     resetButton.addEventListener('click', () => {
         console.log(`reset button clicked`)
         gameboard.clearBoard();
+        human.score = 0;
+        bot.score = 0;
         updateScreen();
     });
-
-    // Event listener for start game button (within a dialog?)
-
-    // Display number of rounds in the round button
-
-    // Display a winner
-
-
-
-
 
     boardDiv.addEventListener('click', cellClickHandler);
 
     // Initial render
     updateScreen();
 
-    return { updateScreen }; // add startNewGame if necessary
+    return { updateScreen };
 })();
