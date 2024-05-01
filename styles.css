@@ -20,9 +20,9 @@ button {
     border: 2px solid black;
     padding: 10px 15px;
     color: var(--grid-color);
-    font-size: 16px;
+    font-size: 30px;
     width: 220px;
-    text-align: left;
+    text-align: center;
 }
 
 h1 {
@@ -88,7 +88,7 @@ h1 {
 .score-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 5px;
+    gap: 15px;
 }
 
 .footer-buttons {
