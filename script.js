@@ -100,12 +100,6 @@ const gameController = (function () {
     // Getter for the active player
     const getActivePlayer = () => activePlayer;
 
-    // const startNewGame = () => {
-    //     gameboard.clearBoard();
-    //     playRound();
-    //     // console.log(`${getActivePlayer().name}'s turn.`);
-    // };
-
     // Checks if every cell in every row is full and returns true if so
     function isBoardFull(board) {
         return board.every(row => row.every(cell => cell.getValue() !== 0));
