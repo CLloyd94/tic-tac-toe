@@ -19,20 +19,21 @@ const gameboard = (function () {
     // Alows player to mark something on the gameboard via the array
     const placeMark = (row, column, player) => {
 
+
         // If the selection is not a cell
         if (row < 0 || row >= rows || column < 0 || column >= columns) {
-            console.log("Invalid cell coordinates.");
+            console.log(`Invalid cell coordinates, ${player}!`);
             return false;
         }
         // If the selected cell is empty, add the player's mark
         else if (board[row][column].getValue() === 0) {
             board[row][column].addMark(player);
-            console.log("Successful move.");
+            console.log(`Successful move by ${player}.`);
             return true;
         // If the selected cell is not empty
         } else {
-            console.log("Cell is already occupied."); // This needs to be fixed.
-            return false;
+            console.log(`${player} tried to place mark in [${row}, ${column}]; cell is already occupied.`); // This needs to be fixed.
+            return;
         }
     };
 
@@ -82,27 +83,24 @@ const gameController = (function () {
     const human = createPlayer(playerName, 'X');
     // Create one computer player
     const bot = createPlayer(botName, 'O')
-
-    const players = [human, bot];
-
     // Getter for human player
     const getHuman = () => human;
-
     // Getter for bot player
     const getBot = () => bot;
-
+    // When game starts, human goes first
     let activePlayer = human;
-
+    // Logic for switching turns to the other player
     const switchPlayerTurn = () => {
         activePlayer = activePlayer === human ? bot : human;
     };
+    // Getter for the active player
     const getActivePlayer = () => activePlayer;
 
-    const startNewGame = () => {
-        gameboard.clearBoard();
-        playRound();
-        // console.log(`${getActivePlayer().name}'s turn.`);
-    };
+    // const startNewGame = () => {
+    //     gameboard.clearBoard();
+    //     playRound();
+    //     // console.log(`${getActivePlayer().name}'s turn.`);
+    // };
 
     // Checks if every cell in every row is full and returns true if so
     function isBoardFull(board) {
@@ -148,36 +146,54 @@ const gameController = (function () {
         return null; // No winner found
     };
 
+    const updateGameState = () => {
+        let winner = checkWinner(gameboard.getBoard());
+        if (winner) {
+            console.log(`${winner === 'X' ? human.name : bot.name} wins!`);
+            // (winner === 'X' ? human : bot).increaseScore();
+            winner.increaseScore();
+            console.log('Starting new game');
+            gameboard.clearBoard();
+            updateScreen();
+        } else if (isBoardFull(gameboard.getBoard())) {
+            console.log("It's a tie!");
+            gameboard.clearBoard();
+            updateScreen();
+        } else {
+            switchPlayerTurn(); // not doing so correctly.
+            console.log(`It is now ${getActivePlayer().name}'s turn`);
+        }
+    };
+
     // Include logic for number of rounds - loop through until number of rounds complete
     // let round;
     const playRound = (row, column) => {
-
         if (activePlayer === bot) {
-            let row = Math.floor(Math.random() * 3);
-            let column = Math.floor(Math.random() * 3);
-            gameboard.placeMark(row, column, getActivePlayer().mark);
-            switchPlayerTurn();
+            let placed = false;
+            let attempts = 0;
+            while (!placed && attempts < 50) {
+                row = Math.floor(Math.random() * 3);
+                column = Math.floor(Math.random() * 3);
+                placed = gameboard.placeMark(row, column, bot.mark);
+                console.log(`${activePlayer} placed mark at [${row}, ${column}]`);
+                attempts++;
+            }
+        } else {
+            if (!gameboard.placeMark(row, column, human.mark)) {
+                console.log(`${activePlayer} placed mark at [${row}, ${column}]`);
+                console.log('Invalid move by human');
+                return;
+            }
         }
+        updateGameState();
+    }
+        // gameboard.placeMark(row, column, getActivePlayer().mark);
+        // switchPlayerTurn();
 
-        if (gameboard.placeMark(row, column, getActivePlayer().mark)) {
-            // Need some logic to handle player scores after they win a round.
-            let winner = checkWinner(gameboard.getBoard());
-            if (winner) {
-                console.log(`${winner === 'X' ? human.name : bot.name} wins!`);
-                (winner === 'X' ? human : bot).increaseScore();
-                console.log('Starting new game');
-                startNewGame();
-            } else if (isBoardFull(gameboard.getBoard())) {
-                console.log("It's a tie!");
-                startNewGame();
-            } else {
-                switchPlayerTurn(); // not doing so correctly.
-                console.log(`It is now ${getActivePlayer().name}'s turn`);
-            }     
-        }
-}
+    // if (gameboard.placeMark(row, column, getActivePlayer().mark)) {
+    
 
-    return { playRound, getHuman, getBot, getActivePlayer, startNewGame, players };
+    return { playRound, getHuman, getBot, getActivePlayer }; // add startNewGame if necessary
 
 })();
 
@@ -243,6 +259,9 @@ const displayController = (function () {
     };
 
     // Event listener for reset button
+    resetButton.addEventListener('click', () => {
+        gameboard.clearBoard();
+    });
 
     // Event listener for start game button (within a dialog?)
 
