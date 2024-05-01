@@ -28,7 +28,7 @@ const gameboard = (function () {
         // If the selected cell is empty, add the player's mark
         else if (board[row][column].getValue() === 0) {
             board[row][column].addMark(player);
-            console.log(`Successful move by ${player}.`);
+            console.log(`Successful move by ${player} at [${row}, ${column}].`);
             return true;
         // If the selected cell is not empty
         } else {
@@ -39,11 +39,11 @@ const gameboard = (function () {
 
     // clearBoard function to clear all values from all cells
     const clearBoard = () => {
-        board.length = 0;
+        // board.length = 0;
         for (let i = 0; i < rows; i++) {
-            board[i] = [];
+            // board[i] = [];
             for (let j = 0; j < columns; j++) {
-                board[i].push(Cell());
+                board[i][j].clear();
             }
         }
     }
@@ -63,7 +63,11 @@ function Cell () {
     // Get the current value of the cell
     const getValue = () => value;
 
-    return { addMark, getValue };
+    const clear = () => {
+        value = 0;
+    };
+
+    return { addMark, getValue, clear };
 };
 
 // 2) player factory function
@@ -150,15 +154,14 @@ const gameController = (function () {
         let winner = checkWinner(gameboard.getBoard());
         if (winner) {
             console.log(`${winner === 'X' ? human.name : bot.name} wins!`);
-            // (winner === 'X' ? human : bot).increaseScore();
-            winner.increaseScore();
+            (winner === 'X' ? human : bot).increaseScore();
             console.log('Starting new game');
             gameboard.clearBoard();
-            updateScreen();
+            displayController.updateScreen();
         } else if (isBoardFull(gameboard.getBoard())) {
             console.log("It's a tie!");
             gameboard.clearBoard();
-            updateScreen();
+            displayController.updateScreen();
         } else {
             switchPlayerTurn(); // not doing so correctly.
             console.log(`It is now ${getActivePlayer().name}'s turn`);
@@ -175,7 +178,6 @@ const gameController = (function () {
                 row = Math.floor(Math.random() * 3);
                 column = Math.floor(Math.random() * 3);
                 placed = gameboard.placeMark(row, column, bot.mark);
-                console.log(`${activePlayer} placed mark at [${row}, ${column}]`);
                 attempts++;
             }
         } else {
@@ -217,6 +219,7 @@ const displayController = (function () {
     playerScore.textContent = `${human.name}'s score: ${human.score}`;
     botScore.textContent = `${bot.name}'s score: ${bot.score}`;
 
+    // Clear the screen with a new board
     const updateScreen = () => {
         boardDiv.innerHTML = '';
         // Get the board array
@@ -251,7 +254,7 @@ const displayController = (function () {
         // const selectedCell = row[column];
         // if (!selectedCell) return;
         gameController.playRound(row, column)
-            updateScreen();
+        updateScreen();
         
         // if (!selectedCell) return;
         // gameController.playRound(selectedCell);
@@ -260,7 +263,9 @@ const displayController = (function () {
 
     // Event listener for reset button
     resetButton.addEventListener('click', () => {
+        console.log(`reset button clicked`)
         gameboard.clearBoard();
+        updateScreen();
     });
 
     // Event listener for start game button (within a dialog?)
@@ -277,4 +282,6 @@ const displayController = (function () {
 
     // Initial render
     updateScreen();
+
+    return { updateScreen }; // add startNewGame if necessary
 })();
